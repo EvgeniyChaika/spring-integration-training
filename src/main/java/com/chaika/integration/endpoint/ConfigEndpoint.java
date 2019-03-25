@@ -1,10 +1,11 @@
 package com.chaika.integration.endpoint;
 
+import com.chaika.integration.message.MessagePrintService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.integration.channel.DirectChannel;
-import org.springframework.messaging.MessageHandler;
+import org.springframework.messaging.Message;
 
 /**
  * Created by echaika on 25.03.2019
@@ -28,14 +29,12 @@ public class ConfigEndpoint {
     }
 
     @Bean
-    void subscriberEndpointOutputChannel() {
-        endpointOutputChannel().subscribe(message -> System.out.println(message.getPayload()));
+    public void subscriberEndpointOutputChannel() {
+        endpointOutputChannel().subscribe(message -> new MessagePrintService().print(message));
     }
 
-    //TODO fix inputChannel creation bug
-    @Bean
     @ServiceActivator(inputChannel = "endpointInputChannel", outputChannel = "endpointOutputChannel")
-    public MessageHandler endpointServiceActivator() {
-        return message -> endpointMessagePrintService().print(message);
+    public Message<?> endpointServiceActivator(Message<?> message) {
+        return endpointMessagePrintService().print(message);
     }
 }

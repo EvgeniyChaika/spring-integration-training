@@ -10,6 +10,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.ImportResource;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.integration.channel.DirectChannel;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
@@ -33,7 +34,7 @@ public class SpringIntegrationTrainingApplication implements ApplicationRunner {
     @Autowired
     public SpringIntegrationTrainingApplication(DemoCustomGateway gateway, MessagePrintService messagePrintService,
                                                 @Qualifier("channelDirectChannel") DirectChannel directChannel,
-                                                @Qualifier("endpointInputChannel") DirectChannel endpointInputChannel) {
+                                                @Qualifier("endpointInputChannel") @Lazy DirectChannel endpointInputChannel) {
         this.gateway = gateway;
         this.messagePrintService = messagePrintService;
         this.directChannel = directChannel;

@@ -1,5 +1,7 @@
 package com.chaika.integration.endpoint;
 
+import com.chaika.integration.message.MessagePrintService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.Message;
 
@@ -8,12 +10,11 @@ import org.springframework.messaging.Message;
  */
 public class EndpointMessagePrintService {
 
-    public Message<?> print(Message<?> message) {
+    @Autowired
+    private MessagePrintService messagePrintService;
 
-        System.out.println("--Message headers--");
-        message.getHeaders().forEach((key, value) -> System.out.println(key + ": " + value));
-        System.out.println("--Message payload--");
-        System.out.println(message.getPayload());
+    public Message<?> print(Message<?> message) {
+        messagePrintService.print(message);
 
         return MessageBuilder
                 .fromMessage(message)

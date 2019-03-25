@@ -7,10 +7,10 @@ import org.springframework.messaging.Message;
  */
 public class MessagePrintService {
 
-    public void print(Message<String> message) {
+    public void print(Message<?> message) {
         System.out.println("--Message headers--");
         message.getHeaders().forEach((key, value) -> System.out.println(key + ": " + value));
         System.out.println("--Message payload--");
-        System.out.println(message.getPayload());
+        System.out.println(message.getPayload() + "\n");
     }
 }
