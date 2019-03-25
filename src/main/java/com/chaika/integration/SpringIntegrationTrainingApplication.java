@@ -28,12 +28,16 @@ public class SpringIntegrationTrainingApplication implements ApplicationRunner {
 
     private DirectChannel directChannel;
 
+    private DirectChannel endpointInputChannel;
+
     @Autowired
     public SpringIntegrationTrainingApplication(DemoCustomGateway gateway, MessagePrintService messagePrintService,
-                                                @Qualifier("channelDirectChannel") DirectChannel directChannel) {
+                                                @Qualifier("channelDirectChannel") DirectChannel directChannel,
+                                                @Qualifier("endpointInputChannel") DirectChannel endpointInputChannel) {
         this.gateway = gateway;
         this.messagePrintService = messagePrintService;
         this.directChannel = directChannel;
+        this.endpointInputChannel = endpointInputChannel;
     }
 
     public static void main(String[] args) {
@@ -61,5 +65,9 @@ public class SpringIntegrationTrainingApplication implements ApplicationRunner {
         //channel
         System.out.println("-------------channel-------------");
         directChannel.send(message);
+
+        //endpoint
+        System.out.println("-------------endpoint-------------");
+        endpointInputChannel.send(message);
     }
 }
