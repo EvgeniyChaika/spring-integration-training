@@ -3,17 +3,16 @@ package com.chaika.integration;
 import com.chaika.integration.demo.DemoCustomGateway;
 import com.chaika.integration.message.MessagePrintService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.ImportResource;
+import org.springframework.integration.channel.DirectChannel;
 import org.springframework.messaging.Message;
-import org.springframework.messaging.MessageHeaders;
-import org.springframework.messaging.support.GenericMessage;
 import org.springframework.messaging.support.MessageBuilder;
-import org.springframework.messaging.support.MessageHeaderAccessor;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,10 +26,14 @@ public class SpringIntegrationTrainingApplication implements ApplicationRunner {
 
     private MessagePrintService messagePrintService;
 
+    private DirectChannel directChannel;
+
     @Autowired
-    public SpringIntegrationTrainingApplication(DemoCustomGateway gateway, MessagePrintService messagePrintService) {
+    public SpringIntegrationTrainingApplication(DemoCustomGateway gateway, MessagePrintService messagePrintService,
+                                                @Qualifier("channelDirectChannel") DirectChannel directChannel) {
         this.gateway = gateway;
         this.messagePrintService = messagePrintService;
+        this.directChannel = directChannel;
     }
 
     public static void main(String[] args) {
@@ -54,5 +57,9 @@ public class SpringIntegrationTrainingApplication implements ApplicationRunner {
                 .copyHeadersIfAbsent(map)
                 .build();
         messagePrintService.print(message);
+
+        //channel
+        System.out.println("-------------channel-------------");
+        directChannel.send(message);
     }
 }
