@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.ImportResource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.integration.channel.DirectChannel;
+import org.springframework.integration.core.MessagingTemplate;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 
@@ -31,14 +32,18 @@ public class SpringIntegrationTrainingApplication implements ApplicationRunner {
 
     private DirectChannel endpointInputChannel;
 
+    private DirectChannel messagingTemplateInputChannel;
+
     @Autowired
     public SpringIntegrationTrainingApplication(DemoCustomGateway gateway, MessagePrintService messagePrintService,
                                                 @Qualifier("channelDirectChannel") DirectChannel directChannel,
-                                                @Qualifier("endpointInputChannel") @Lazy DirectChannel endpointInputChannel) {
+                                                @Qualifier("endpointInputChannel") @Lazy DirectChannel endpointInputChannel,
+                                                @Qualifier("messagingTemplateInputChannel") @Lazy DirectChannel messagingTemplateInputChannel) {
         this.gateway = gateway;
         this.messagePrintService = messagePrintService;
         this.directChannel = directChannel;
         this.endpointInputChannel = endpointInputChannel;
+        this.messagingTemplateInputChannel = messagingTemplateInputChannel;
     }
 
     public static void main(String[] args) {
@@ -70,5 +75,11 @@ public class SpringIntegrationTrainingApplication implements ApplicationRunner {
         //endpoint
         System.out.println("-------------endpoint-------------");
         endpointInputChannel.send(message);
+
+        //messaging template
+        System.out.println("-------------messaging template-------------");
+        MessagingTemplate messagingTemplate = new MessagingTemplate();
+        Message receivedMessage = messagingTemplate.sendAndReceive(messagingTemplateInputChannel, message);
+        messagePrintService.print(receivedMessage);
     }
 }
