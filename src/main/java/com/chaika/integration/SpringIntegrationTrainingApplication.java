@@ -1,5 +1,6 @@
 package com.chaika.integration;
 
+import com.chaika.integration.channels.queuechannel.QueueChannelPrinterGateway;
 import com.chaika.integration.demo.DemoCustomGateway;
 import com.chaika.integration.message.MessagePrintService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,8 +17,11 @@ import org.springframework.integration.core.MessagingTemplate;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Future;
 
 @SpringBootApplication
 @Configuration
@@ -34,16 +38,20 @@ public class SpringIntegrationTrainingApplication implements ApplicationRunner {
 
     private DirectChannel messagingTemplateInputChannel;
 
+    private QueueChannelPrinterGateway queueChannelPrinterGateway;
+
     @Autowired
     public SpringIntegrationTrainingApplication(DemoCustomGateway gateway, MessagePrintService messagePrintService,
                                                 @Qualifier("channelDirectChannel") DirectChannel directChannel,
                                                 @Qualifier("endpointInputChannel") @Lazy DirectChannel endpointInputChannel,
-                                                @Qualifier("messagingTemplateInputChannel") @Lazy DirectChannel messagingTemplateInputChannel) {
+                                                @Qualifier("messagingTemplateInputChannel") @Lazy DirectChannel messagingTemplateInputChannel,
+                                                QueueChannelPrinterGateway queueChannelPrinterGateway) {
         this.gateway = gateway;
         this.messagePrintService = messagePrintService;
         this.directChannel = directChannel;
         this.endpointInputChannel = endpointInputChannel;
         this.messagingTemplateInputChannel = messagingTemplateInputChannel;
+        this.queueChannelPrinterGateway = queueChannelPrinterGateway;
     }
 
     public static void main(String[] args) {
@@ -81,5 +89,19 @@ public class SpringIntegrationTrainingApplication implements ApplicationRunner {
         MessagingTemplate messagingTemplate = new MessagingTemplate();
         Message receivedMessage = messagingTemplate.sendAndReceive(messagingTemplateInputChannel, message);
         messagePrintService.print(receivedMessage);
+
+        //messaging template
+        System.out.println("-------------queue channel-------------");
+        List<Future<Message<String>>> futures = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            Message<String> queueChannelMessage = MessageBuilder.withPayload("Printing message payload for " + i)
+                    .setHeader("messageNumber", i).build();
+            System.out.println("Sending message " + i);
+            futures.add(queueChannelPrinterGateway.print(queueChannelMessage));
+        }
+
+        for (Future<Message<String>> future : futures) {
+            System.out.println(future.get().getPayload());
+        }
     }
 }
