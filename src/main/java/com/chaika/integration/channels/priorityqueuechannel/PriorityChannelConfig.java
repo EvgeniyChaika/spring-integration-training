@@ -9,6 +9,8 @@ import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.integration.channel.PriorityChannel;
 import org.springframework.messaging.Message;
 
+import java.util.Comparator;
+
 /**
  * Created by echaika on 01.04.2019
  */
@@ -17,11 +19,17 @@ import org.springframework.messaging.Message;
 public class PriorityChannelConfig {
 
     @Bean
-    public PriorityChannel priorityChannel() {
-        return new PriorityChannel(10);
+    public CustomMessageComparator customMessageComparator() {
+        return new CustomMessageComparator();
     }
 
-    @ServiceActivator(inputChannel = "priorityChannel", poller = @Poller(fixedRate = "5000", maxMessagesPerPoll = "2"))
+    @Bean
+    @SuppressWarnings("unchecked")
+    public PriorityChannel priorityChannel() {
+        return new PriorityChannel(10, (Comparator) customMessageComparator());
+    }
+
+    @ServiceActivator(inputChannel = "priorityChannel", poller = @Poller(fixedRate = "10000", maxMessagesPerPoll = "2"))
     public Message<?> priorityQueueChannelServiceActivator(Message<String> message) {
         return new QueueChannelPrintService().print(message);
     }

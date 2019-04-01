@@ -114,7 +114,7 @@ public class SpringIntegrationTrainingApplication implements ApplicationRunner {
         List<Future<Message<String>>> futuresPriority = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             Message<String> queueChannelMessage = MessageBuilder.withPayload("Printing message payload for " + i)
-                    .setHeader("messageNumber", i).setPriority(i).build();
+                    .setHeader("messageNumber", i).build();
             System.out.println("Sending message " + i);
             futuresPriority.add(priorityQueueChannelPrinterGateway.print(queueChannelMessage));
         }
